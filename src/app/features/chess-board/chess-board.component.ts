@@ -25,9 +25,9 @@ interface SquareData {
   template: `
     <div class="relative flex flex-col items-center justify-center select-none w-full max-w-[560px] aspect-square mx-auto">
       <!-- Outer Board Frame -->
-      <div class="w-full h-full p-2.5 sm:p-3.5 bg-gradient-to-br from-amber-950 via-amber-900 to-amber-950 rounded-2xl shadow-2xl ring-1 ring-amber-700/50 flex items-center justify-center">
+      <div class="w-full h-full p-2.5 sm:p-3.5 bg-slate-900/80 dark:bg-black/90 dark:border dark:border-white/10 dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] light:bg-amber-950 light:border-amber-900 rounded-2xl shadow-2xl transition-all duration-300 flex items-center justify-center">
         <!-- Inner 8x8 Grid -->
-        <div class="grid grid-cols-8 grid-rows-8 w-full h-full rounded-lg overflow-hidden border-2 border-amber-950/60 shadow-inner">
+        <div class="grid grid-cols-8 grid-rows-8 w-full h-full rounded-xl overflow-hidden border-2 border-slate-950/80 dark:border-white/5 shadow-inner">
           <app-square
             *ngFor="let sq of renderedSquares()"
             [square]="sq.square"
@@ -49,22 +49,22 @@ interface SquareData {
       <!-- Pawn Promotion Overlay Modal -->
       <div
         *ngIf="chessEngine.pendingPromotion(); let promotion"
-        class="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-2xl flex items-center justify-center z-50 animate-fade-in p-4"
+        class="absolute inset-0 bg-black/70 backdrop-blur-md rounded-2xl flex items-center justify-center z-50 animate-fade-in p-4"
       >
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 shadow-2xl max-w-sm w-full text-center flex flex-col items-center">
-          <h3 class="text-xl font-bold text-amber-400 mb-1">Promote Pawn</h3>
-          <p class="text-xs text-slate-400 mb-5">Select a piece to upgrade your pawn</p>
+        <div class="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl max-w-sm w-full text-center flex flex-col items-center transition-colors">
+          <h3 class="text-xl font-bold text-amber-500 dark:text-amber-400 mb-1">Promote Pawn</h3>
+          <p class="text-xs text-slate-500 dark:text-zinc-400 mb-5">Select a piece to upgrade your pawn</p>
 
           <div class="grid grid-cols-4 gap-3 w-full mb-5">
             <button
               *ngFor="let option of promotionOptions"
               (click)="selectPromotion(option)"
-              class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-800 hover:bg-amber-600/30 border border-slate-700 hover:border-amber-500 transition-all cursor-pointer transform hover:scale-105 group"
+              class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-amber-500/20 dark:hover:bg-amber-500/20 border border-slate-200 dark:border-zinc-800 hover:border-amber-500 transition-all cursor-pointer transform hover:scale-105 group shadow-sm"
             >
               <div class="w-12 h-12 flex items-center justify-center mb-1">
                 <app-piece [type]="option" [color]="promotion.color"></app-piece>
               </div>
-              <span class="text-[11px] font-semibold text-slate-300 group-hover:text-amber-300 uppercase tracking-wider">
+              <span class="text-[11px] font-bold text-slate-700 dark:text-zinc-300 group-hover:text-amber-600 dark:group-hover:text-amber-400 uppercase tracking-wider">
                 {{ getPieceName(option) }}
               </span>
             </button>
@@ -72,7 +72,7 @@ interface SquareData {
 
           <button
             (click)="cancelPromotion()"
-            class="text-xs text-slate-400 hover:text-slate-200 px-4 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 transition-colors"
+            class="text-xs text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-zinc-100 px-4 py-2 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 transition-colors font-medium cursor-pointer"
           >
             Cancel Move
           </button>

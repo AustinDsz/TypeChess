@@ -1,7 +1,31 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.light {
+    color-scheme: light;
+  }
+
   body {
-    @apply bg-slate-950 text-slate-100 min-h-screen font-sans antialiased select-none;
+    @apply min-h-screen font-sans antialiased select-none transition-colors duration-200;
+  }
+
+  /* AMOLED Dark Defaults */
+  html.dark body {
+    @apply bg-black text-slate-100;
+    background-image: radial-gradient(circle at 50% 0%, #0a0f1d 0%, #000000 70%);
+  }
+
+  /* Clean Light Defaults */
+  html.light body {
+    @apply bg-slate-50 text-slate-900;
+    background-image: radial-gradient(circle at 50% 0%, #f1f5f9 0%, #ffffff 80%);
   }
 }

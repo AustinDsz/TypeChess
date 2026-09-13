@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-09-14
+
+### Added
+- **AMOLED Dark & Clean Light Design System**:
+  - Implemented `ThemeService` with Signal-based reactivity, DOM sync, and `localStorage` persistence (`typechess-theme`).
+  - Added dedicated animated **Sun / Moon** theme switcher button in the top navigation bar.
+  - **AMOLED Dark Mode (Default)**: Deep radial black background (`#000000`), carbon midnight board squares (`#10141c` / `#242b38`), and glowing golden highlights.
+  - **Clean Light Mode**: Pure white cards, crisp slate backgrounds, and classic walnut wood chessboard squares (`#f0d9b5` / `#b58863`).
+  - Adapted coordinate notations, captured piece trays, move ledger, and promotion dialogs for full contrast across both light and dark themes.
+
+---
+
 ## [1.0.0] - 2026-09-13
 
 ### Added
