@@ -1,0 +1,35 @@
+<div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950">
+  <!-- Top Navigation Bar -->
+  <app-navbar></app-navbar>
+
+  <!-- Main Game Layout Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8 flex flex-col items-center">
+    <!-- Game Mode Switcher -->
+    <app-mode-selector class="w-full max-w-md"></app-mode-selector>
+
+    <!-- Interactive Game Arena -->
+    <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start justify-center max-w-6xl">
+      <!-- Left / Center: Interactive Chess Board -->
+      <div class="lg:col-span-7 xl:col-span-7 flex flex-col items-center justify-center w-full">
+        <app-chess-board class="w-full"></app-chess-board>
+      </div>
+
+      <!-- Right Column: Player Turn Status, Controls & Move History -->
+      <div class="lg:col-span-5 xl:col-span-5 flex flex-col gap-5 w-full">
+        <!-- Player Info & Turn Tracker -->
+        <app-game-status></app-game-status>
+
+        <!-- Quick Game Actions (Flip, Undo, New Game) -->
+        <app-game-actions></app-game-actions>
+
+        <!-- Move History Sheet -->
+        <app-move-history></app-move-history>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-slate-900 py-4 px-6 text-center text-xs text-slate-500">
+    TypeChess &bull; Built with chess.js & Angular Signals &bull; Pass-and-Play Edition
+  </footer>
+</div>
