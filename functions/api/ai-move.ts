@@ -46,7 +46,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
-    // Prompt optimized for Gemini 2.5 Flash
+    // Prompt optimized for Gemini 2.5 Flash / Gemini 2.0 Flash
     const prompt = `You are a Grandmaster Chess Engine and witty personality named "TypeChess AI".
 You are playing as ${aiColor === 'w' ? 'White' : 'Black'}.
 Difficulty setting: ${difficulty.toUpperCase()}.
@@ -65,48 +65,57 @@ Respond ONLY with a valid JSON object matching this schema:
   "commentary": "<short witty or tactical 1-sentence comment>"
 }`;
 
-    // Using Gemini 2.5 Flash endpoint
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    // Priority model list: Try gemini-2.0-flash, gemini-1.5-flash, or gemini-2.5-flash
+    const candidateModels = [
+      'gemini-2.0-flash',
+      'gemini-1.5-flash',
+      'gemini-2.5-flash',
+    ];
 
-    const response = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          response_mime_type: 'application/json',
-          temperature: difficulty === 'easy' ? 0.7 : difficulty === 'medium' ? 0.4 : 0.1,
-        },
-      }),
-    });
+    let lastError: string = '';
+    let selectedModelUsed = '';
+    let rawContent: string | null = null;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini 2.5 Flash API Error:', errorText);
-      const fallbackMove = selectFallbackMove(legalMoves, difficulty);
-      return new Response(
-        JSON.stringify({
-          move: fallbackMove,
-          commentary: 'Calculated a solid positional move (API Fallback).',
-          isFallback: true,
-          engine: 'Local Heuristic Fallback (API error: ' + response.status + ')',
-          errorDetails: errorText,
-        }),
-        { status: 200, headers }
-      );
+    for (const modelName of candidateModels) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+      try {
+        const response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: difficulty === 'easy' ? 0.7 : difficulty === 'medium' ? 0.4 : 0.1,
+            },
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawContent) {
+            selectedModelUsed = modelName;
+            break;
+          }
+        } else {
+          lastError = await response.text();
+          console.warn(`Model ${modelName} returned status ${response.status}:`, lastError);
+        }
+      } catch (e: any) {
+        lastError = e.message;
+      }
     }
-
-    const data = await response.json();
-    const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!rawContent) {
       const fallbackMove = selectFallbackMove(legalMoves, difficulty);
       return new Response(
         JSON.stringify({
           move: fallbackMove,
-          commentary: 'Solid move calculated.',
+          commentary: 'Calculated a solid positional move (API Fallback).',
           isFallback: true,
-          engine: 'Local Heuristic Fallback (Empty candidate response)',
+          engine: 'Local Heuristic Fallback (API error)',
+          errorDetails: lastError,
         }),
         { status: 200, headers }
       );
@@ -129,7 +138,7 @@ Respond ONLY with a valid JSON object matching this schema:
         move: selectedMove,
         commentary: parsed.commentary || 'Let\'s see how you handle this!',
         isFallback: !isMoveValid,
-        engine: isMoveValid ? 'Google Gemini 2.5 Flash (Cloud)' : 'Local Heuristic Fallback (Invalid Move by LLM)',
+        engine: isMoveValid ? `Google ${selectedModelUsed} (Cloud)` : 'Local Heuristic Fallback (Invalid Move by LLM)',
       }),
       { status: 200, headers }
     );
