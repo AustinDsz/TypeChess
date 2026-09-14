@@ -11,6 +11,7 @@ export class AiService {
 
   public isAiThinking = signal<boolean>(false);
   public aiCommentary = signal<string | null>(null);
+  public activeEngine = signal<string>('Google Gemini 2.5 Flash');
   public difficulty = signal<AiDifficulty>('medium');
   public aiColor = signal<'w' | 'b'>('b');
 
@@ -41,7 +42,6 @@ export class AiService {
     };
 
     try {
-      // Calls the Cloudflare Pages Function backend proxy
       const response = await firstValueFrom(
         this.http.post<AiMoveResponse>('/api/ai-move', payload)
       );
@@ -50,17 +50,26 @@ export class AiService {
         if (response.commentary) {
           this.aiCommentary.set(response.commentary);
         }
+        if (response.engine) {
+          this.activeEngine.set(response.engine);
+        }
+        if (response.isFallback) {
+          console.warn('[TypeChess AI Telemetry] Move generated via Fallback:', response.engine, response.errorDetails);
+        } else {
+          console.log('[TypeChess AI Telemetry] Move generated successfully by Gemini 2.5 Flash:', response);
+        }
         return response.move;
       }
     } catch (err) {
       console.warn('Backend AI proxy error, using local fallback:', err);
+      this.activeEngine.set('Local Emergency Fallback');
     } finally {
       this.isAiThinking.set(false);
     }
 
-    // Client-side emergency fallback if offline or backend fails
+    // Client-side emergency fallback
     const fallbackMove = this.localFallbackMove(legalMoves, this.difficulty());
-    this.aiCommentary.set('Making a tactical calculation.');
+    this.aiCommentary.set('Playing a solid tactical response.');
     return fallbackMove;
   }
 

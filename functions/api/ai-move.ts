@@ -38,8 +38,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(
         JSON.stringify({
           move: fallbackMove,
-          commentary: 'Playing standard tactical response.',
+          commentary: 'Playing standard tactical response (Local Fallback: No API Key found).',
           isFallback: true,
+          engine: 'Local Heuristic Engine (Missing API Key)',
         }),
         { status: 200, headers }
       );
@@ -86,8 +87,10 @@ Respond ONLY with a valid JSON object matching this schema:
       return new Response(
         JSON.stringify({
           move: fallbackMove,
-          commentary: 'Calculated a solid positional move.',
+          commentary: 'Calculated a solid positional move (API Fallback).',
           isFallback: true,
+          engine: 'Local Heuristic Fallback (API error: ' + response.status + ')',
+          errorDetails: errorText,
         }),
         { status: 200, headers }
       );
@@ -103,6 +106,7 @@ Respond ONLY with a valid JSON object matching this schema:
           move: fallbackMove,
           commentary: 'Solid move calculated.',
           isFallback: true,
+          engine: 'Local Heuristic Fallback (Empty candidate response)',
         }),
         { status: 200, headers }
       );
@@ -115,8 +119,8 @@ Respond ONLY with a valid JSON object matching this schema:
       parsed = {};
     }
 
-    // Verify move is strictly in legalMoves
-    const selectedMove = parsed.move && legalMoves.includes(parsed.move)
+    const isMoveValid = parsed.move && legalMoves.includes(parsed.move);
+    const selectedMove = isMoveValid
       ? parsed.move
       : selectFallbackMove(legalMoves, difficulty);
 
@@ -124,7 +128,8 @@ Respond ONLY with a valid JSON object matching this schema:
       JSON.stringify({
         move: selectedMove,
         commentary: parsed.commentary || 'Let\'s see how you handle this!',
-        isFallback: !parsed.move || !legalMoves.includes(parsed.move),
+        isFallback: !isMoveValid,
+        engine: isMoveValid ? 'Google Gemini 2.5 Flash (Cloud)' : 'Local Heuristic Fallback (Invalid Move by LLM)',
       }),
       { status: 200, headers }
     );

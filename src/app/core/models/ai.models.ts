@@ -13,4 +13,6 @@ export interface AiMoveResponse {
   move: string;
   commentary?: string;
   isFallback?: boolean;
+  engine?: string;
+  errorDetails?: string;
 }

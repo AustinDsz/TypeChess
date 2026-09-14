@@ -28,12 +28,12 @@ import { ChessEngineService } from '../../core/services/chess-engine.service';
       <div class="flex-1">
         <div class="flex items-center justify-between mb-0.5">
           <span class="text-xs font-bold text-blue-400 flex items-center gap-1.5">
-            Gemini AI
+            Gemini 2.5 Flash
             <span *ngIf="chessEngine.aiService.isAiThinking()" class="text-[10px] text-blue-300 font-normal italic">
               analyzing position...
             </span>
           </span>
-          <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">
+          <span class="text-[9px] font-mono uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 px-1.5 py-0.5 rounded font-bold">
             {{ chessEngine.aiService.difficulty() }}
           </span>
         </div>
@@ -41,6 +41,12 @@ import { ChessEngineService } from '../../core/services/chess-engine.service';
         <p *ngIf="chessEngine.aiService.aiCommentary()" class="text-xs text-slate-200 dark:text-zinc-300 italic leading-relaxed">
           "{{ chessEngine.aiService.aiCommentary() }}"
         </p>
+
+        <!-- Live Engine Provenance Badge -->
+        <div class="mt-1.5 flex items-center gap-1.5 text-[10px] text-slate-400 dark:text-zinc-500">
+          <span class="w-1.5 h-1.5 rounded-full" [class]="chessEngine.aiService.activeEngine().includes('Gemini') ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'"></span>
+          <span>Engine: {{ chessEngine.aiService.activeEngine() }}</span>
+        </div>
       </div>
     </div>
   `,
