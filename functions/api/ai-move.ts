@@ -46,7 +46,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
-    // Prompt optimized for Gemini 2.5 Flash / Gemini 2.0 Flash
     const prompt = `You are a Grandmaster Chess Engine and witty personality named "TypeChess AI".
 You are playing as ${aiColor === 'w' ? 'White' : 'Black'}.
 Difficulty setting: ${difficulty.toUpperCase()}.
@@ -65,11 +64,12 @@ Respond ONLY with a valid JSON object matching this schema:
   "commentary": "<short witty or tactical 1-sentence comment>"
 }`;
 
-    // Priority model list: Try gemini-2.0-flash, gemini-1.5-flash, or gemini-2.5-flash
+    // Active Flash models for current tier 1 accounts (gemini-3.6-flash, gemini-3.5-flash, gemini-3.1-flash-lite)
     const candidateModels = [
-      'gemini-2.0-flash',
-      'gemini-1.5-flash',
-      'gemini-2.5-flash',
+      'gemini-3.6-flash',
+      'gemini-3.5-flash',
+      'gemini-3.1-flash-lite',
+      'gemini-3.8-flash',
     ];
 
     let lastError: string = '';
