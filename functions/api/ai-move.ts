@@ -38,7 +38,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return new Response(
         JSON.stringify({
           move: fallbackMove,
-          commentary: 'Playing standard tactical response (Local Fallback: No API Key found).',
+          commentary: 'Solid move.',
           isFallback: true,
           engine: 'Local Heuristic Engine (Missing API Key)',
         }),
@@ -46,7 +46,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       );
     }
 
-    const prompt = `You are a Grandmaster Chess Engine and witty personality named "TypeChess AI".
+    // Persona Prompt: "Carl" - concise, confident, 3-6 words only
+    const prompt = `You are "Carl", a chill and confident Grandmaster chess player.
 You are playing as ${aiColor === 'w' ? 'White' : 'Black'}.
 Difficulty setting: ${difficulty.toUpperCase()}.
 
@@ -55,13 +56,20 @@ Move History: ${history && history.length > 0 ? history.join(' ') : 'Game start'
 Strictly Legal Moves Available: [${legalMoves.map((m) => `"${m}"`).join(', ')}]
 
 CRITICAL RULES:
-1. You MUST select exactly ONE move from the "Strictly Legal Moves Available" array above. Do NOT invent any move outside that list.
-2. Provide a short, fun, 1-sentence chess commentary or reaction to the game state.
+1. You MUST select exactly ONE move from the "Strictly Legal Moves Available" list. Do NOT invent any move outside that list.
+2. Commentary Persona ("Carl"): Keep it extremely short (STRICTLY 3 to 6 words only). Cool, casual, witty trash-talk or snappy reaction.
+   Examples of valid comments:
+   - "Nice try, but no."
+   - "Thanks for the free piece."
+   - "Watch your back rank."
+   - "Bold move, let's see."
+   - "Checkmate is coming soon."
+   - "You walked into that."
 
 Respond ONLY with a valid JSON object matching this schema:
 {
   "move": "<one move chosen strictly from the legal moves list>",
-  "commentary": "<short witty or tactical 1-sentence comment>"
+  "commentary": "<strictly 3 to 6 words only>"
 }`;
 
     // Active Flash models for current tier 1 accounts (gemini-3.6-flash, gemini-3.5-flash, gemini-3.1-flash-lite)
@@ -112,7 +120,7 @@ Respond ONLY with a valid JSON object matching this schema:
       return new Response(
         JSON.stringify({
           move: fallbackMove,
-          commentary: 'Calculated a solid positional move (API Fallback).',
+          commentary: 'Solid move.',
           isFallback: true,
           engine: 'Local Heuristic Fallback (API error)',
           errorDetails: lastError,
@@ -136,7 +144,7 @@ Respond ONLY with a valid JSON object matching this schema:
     return new Response(
       JSON.stringify({
         move: selectedMove,
-        commentary: parsed.commentary || 'Let\'s see how you handle this!',
+        commentary: parsed.commentary || 'Nice try, watch this.',
         isFallback: !isMoveValid,
         engine: isMoveValid ? `Google ${selectedModelUsed} (Cloud)` : 'Local Heuristic Fallback (Invalid Move by LLM)',
       }),
