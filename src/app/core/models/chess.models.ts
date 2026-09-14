@@ -19,7 +19,7 @@ export interface MoveInfo {
   flags: string;
 }
 
-export type GameMode = 'pass-and-play' | 'ai-disabled';
+export type GameMode = 'pass-and-play' | 'play-vs-ai';
 
 export interface CapturedPieces {
   w: PieceSymbol[]; // Pieces captured by White (i.e. black pieces removed)

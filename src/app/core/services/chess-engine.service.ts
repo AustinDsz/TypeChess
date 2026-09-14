@@ -1,7 +1,8 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { Chess, PieceSymbol, Color } from 'chess.js';
-import { BoardPiece, MoveInfo, Square, GameMode, CapturedPieces, PromotionState } from '../models/chess.models';
+import { MoveInfo, Square, GameMode, CapturedPieces, PromotionState } from '../models/chess.models';
 import { AudioService } from './audio.service';
+import { AiService } from './ai.service';
 
 const PIECE_VALUES: Record<PieceSymbol, number> = {
   p: 1,
@@ -17,6 +18,7 @@ const PIECE_VALUES: Record<PieceSymbol, number> = {
 })
 export class ChessEngineService {
   private audioService = inject(AudioService);
+  public aiService = inject(AiService);
   private chess = new Chess();
 
   // Reactive State Signals
@@ -58,6 +60,12 @@ export class ChessEngineService {
       const activeColor = this.turn() === 'w' ? 'White' : 'Black';
       return `Check! ${activeColor} is in check.`;
     }
+    if (this.gameMode() === 'play-vs-ai') {
+      if (this.aiService.isAiThinking()) {
+        return 'Gemini AI is thinking...';
+      }
+      return this.turn() === this.aiService.aiColor() ? 'AI is moving...' : 'Your turn';
+    }
     return this.turn() === 'w' ? "White's turn" : "Black's turn";
   });
 
@@ -68,6 +76,9 @@ export class ChessEngineService {
   public setGameMode(mode: GameMode) {
     this.gameMode.set(mode);
     this.resetGame();
+    if (mode === 'play-vs-ai' && this.aiService.aiColor() === 'w') {
+      this.triggerAiTurn();
+    }
   }
 
   public toggleFlip() {
@@ -80,12 +91,25 @@ export class ChessEngineService {
     this.legalMoves.set([]);
     this.lastMove.set(null);
     this.pendingPromotion.set(null);
+    this.aiService.aiCommentary.set(null);
     this.syncState();
+
+    if (this.gameMode() === 'play-vs-ai' && this.aiService.aiColor() === 'w') {
+      this.triggerAiTurn();
+    }
   }
 
   public undoMove() {
-    if (this.chess.history().length === 0) return;
-    this.chess.undo();
+    if (this.chess.history().length === 0 || this.aiService.isAiThinking()) return;
+    
+    // In play vs AI mode, undo 2 moves (Player move + AI move) so it remains player's turn
+    if (this.gameMode() === 'play-vs-ai' && this.chess.history().length >= 2) {
+      this.chess.undo();
+      this.chess.undo();
+    } else {
+      this.chess.undo();
+    }
+
     this.selectedSquare.set(null);
     this.legalMoves.set([]);
     
@@ -102,7 +126,12 @@ export class ChessEngineService {
   }
 
   public handleSquareClick(square: Square): void {
-    if (this.isGameOver() || this.pendingPromotion()) {
+    if (this.isGameOver() || this.pendingPromotion() || this.aiService.isAiThinking()) {
+      return;
+    }
+
+    // If it's vs AI mode and not player's turn, ignore clicks
+    if (this.gameMode() === 'play-vs-ai' && this.turn() === this.aiService.aiColor()) {
       return;
     }
 
@@ -193,11 +222,50 @@ export class ChessEngineService {
         this.audioService.playSound('move');
       }
 
+      // Check if next turn belongs to AI
+      if (!this.isGameOver() && this.gameMode() === 'play-vs-ai' && this.turn() === this.aiService.aiColor()) {
+        this.triggerAiTurn();
+      }
+
       return true;
     } catch {
       this.audioService.playSound('illegal');
       this.clearSelection();
       return false;
+    }
+  }
+
+  public async triggerAiTurn(): Promise<void> {
+    if (this.isGameOver()) return;
+
+    const fen = this.chess.fen();
+    const history = this.chess.history();
+    const legalMoves = this.chess.moves();
+
+    if (legalMoves.length === 0) return;
+
+    const aiMoveSanOrUci = await this.aiService.getAiMove(fen, history, legalMoves);
+
+    if (aiMoveSanOrUci && !this.isGameOver()) {
+      try {
+        const moveRes = this.chess.move(aiMoveSanOrUci);
+        if (moveRes) {
+          this.lastMove.set({ from: moveRes.from as Square, to: moveRes.to as Square });
+          this.syncState();
+
+          if (this.isCheckmate() || this.isDraw() || this.isStalemate()) {
+            this.audioService.playSound('gameover');
+          } else if (this.isCheck()) {
+            this.audioService.playSound('check');
+          } else if (moveRes.captured) {
+            this.audioService.playSound('capture');
+          } else {
+            this.audioService.playSound('move');
+          }
+        }
+      } catch (e) {
+        console.error('Error applying AI move:', e);
+      }
     }
   }
 
