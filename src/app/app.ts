@@ -6,6 +6,7 @@ import { ChessBoardComponent } from './features/chess-board/chess-board.componen
 import { GameStatusComponent } from './features/game-controls/game-status.component';
 import { GameActionsComponent } from './features/game-controls/game-actions.component';
 import { MoveHistoryComponent } from './features/game-controls/move-history.component';
+import { AiCommentaryComponent } from './features/game-controls/ai-commentary.component';
 
 @Component({
   selector: 'app-root',
@@ -18,6 +19,7 @@ import { MoveHistoryComponent } from './features/game-controls/move-history.comp
     GameStatusComponent,
     GameActionsComponent,
     MoveHistoryComponent,
+    AiCommentaryComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

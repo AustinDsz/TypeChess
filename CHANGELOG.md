@@ -10,10 +10,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- Stockfish AI Web Worker engine with configurable difficulty levels (Easy, Medium, Hard, Master).
 - Chess timers / clocks with configurable time formats (Blitz, Rapid, Bullet, Classical).
 - Full user authentication (OAuth / JWT / Firebase) with Elo rating tracking and personal stats.
 - Online real-time multiplayer with WebSockets.
+
+---
+
+## [1.2.0] - 2026-09-14
+
+### Added
+- **Google Cloud Gemini AI Integration**:
+  - Implemented Cloudflare Pages backend edge proxy function (`/api/ai-move`) communicating securely with Google Gemini API without exposing the `GEMINI_API_KEY` secret.
+  - Configured high-speed Gemini Flash models with automated fallback engine to ensure 100% legal moves.
+  - Enabled **"Play vs Gemini"** game mode with customizable difficulty tiers: **Casual (Easy)**, **Club (Medium)**, and **Master (Hard)**.
+  - Introduced **"Carl" AI Persona**: confident, Grandmaster commentary strictly capped to 3–6 words for punchy real-time reactions.
+  - Added live **AI Commentary speech bubble** (`AiCommentaryComponent`) displaying Carl's real-time thoughts and active engine telemetry.
+  - Integrated AI thinking indicator with animated spinner and turn tracking.
+  - Added smart 2-turn undo support during AI play (rolls back both AI and player moves).
+  - Cleaned up debug logging across frontend and backend for production deployment.
 
 ---
 

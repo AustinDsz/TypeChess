@@ -14,10 +14,13 @@
         <app-chess-board class="w-full"></app-chess-board>
       </div>
 
-      <!-- Right Column: Player Turn Status, Controls & Move History -->
-      <div class="lg:col-span-5 xl:col-span-5 flex flex-col gap-5 w-full">
+      <!-- Right Column: Player Turn Status, AI Commentary, Controls & Move History -->
+      <div class="lg:col-span-5 xl:col-span-5 flex flex-col gap-4 w-full">
         <!-- Player Info & Turn Tracker -->
         <app-game-status></app-game-status>
+
+        <!-- Live Gemini AI Commentary (when in Play vs AI mode) -->
+        <app-ai-commentary></app-ai-commentary>
 
         <!-- Quick Game Actions (Flip, Undo, New Game) -->
         <app-game-actions></app-game-actions>
@@ -30,6 +33,6 @@
 
   <!-- Footer -->
   <footer class="w-full border-t border-slate-200 dark:border-white/5 py-4 px-6 text-center text-xs text-slate-400 dark:text-zinc-600 transition-colors">
-    TypeChess &bull; Built with chess.js & Angular Signals &bull; Pass-and-Play Edition
+    TypeChess &bull; Built with chess.js & Angular Signals &bull; Gemini AI & Pass-and-Play Edition
   </footer>
 </div>

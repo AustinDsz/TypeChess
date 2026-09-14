@@ -9,18 +9,26 @@ import { PieceComponent } from '../chess-board/piece/piece.component';
   imports: [CommonModule, PieceComponent],
   template: `
     <div class="flex flex-col gap-3 w-full">
-      <!-- Player 2 (Black) Info Header -->
+      <!-- Player 2 (Black / AI) Info Header -->
       <div
         [class]="chessEngine.turn() === 'b' ? 'bg-white dark:bg-[#0b0f17] border-amber-500/80 shadow-md ring-2 ring-amber-500/20' : 'bg-white/80 dark:bg-black/60 border-slate-200 dark:border-white/5'"
         class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-200 shadow-sm"
       >
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center shadow-inner">
-            <div class="w-4 h-4 rounded-full bg-slate-950 border-2 border-slate-500"></div>
+          <div
+            [class]="chessEngine.gameMode() === 'play-vs-ai' ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 border-blue-400' : 'bg-slate-900 border-slate-700'"
+            class="w-9 h-9 rounded-xl border flex items-center justify-center shadow-inner"
+          >
+            <svg *ngIf="chessEngine.gameMode() === 'play-vs-ai'" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+            </svg>
+            <div *ngIf="chessEngine.gameMode() !== 'play-vs-ai'" class="w-4 h-4 rounded-full bg-slate-950 border-2 border-slate-500"></div>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-bold text-sm text-slate-800 dark:text-zinc-100">Black</span>
+              <span class="font-bold text-sm text-slate-800 dark:text-zinc-100">
+                {{ chessEngine.gameMode() === 'play-vs-ai' ? 'Gemini AI' : 'Black' }}
+              </span>
               <span *ngIf="chessEngine.turn() === 'b' && !chessEngine.isGameOver()" class="flex h-2 w-2 relative">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
@@ -45,7 +53,7 @@ import { PieceComponent } from '../chess-board/piece/piece.component';
         </div>
 
         <div *ngIf="chessEngine.turn() === 'b' && !chessEngine.isGameOver()" class="text-xs font-bold text-amber-700 dark:text-amber-400 px-2.5 py-1 bg-amber-50 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/20 rounded-lg">
-          To Move
+          {{ chessEngine.aiService.isAiThinking() ? 'Thinking...' : 'To Move' }}
         </div>
       </div>
 
@@ -84,7 +92,9 @@ import { PieceComponent } from '../chess-board/piece/piece.component';
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-bold text-sm text-slate-800 dark:text-zinc-100">White</span>
+              <span class="font-bold text-sm text-slate-800 dark:text-zinc-100">
+                {{ chessEngine.gameMode() === 'play-vs-ai' ? 'You (White)' : 'White' }}
+              </span>
               <span *ngIf="chessEngine.turn() === 'w' && !chessEngine.isGameOver()" class="flex h-2 w-2 relative">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
