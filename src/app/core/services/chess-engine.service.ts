@@ -62,9 +62,9 @@ export class ChessEngineService {
     }
     if (this.gameMode() === 'play-vs-ai') {
       if (this.aiService.isAiThinking()) {
-        return 'Gemini AI is thinking...';
+        return 'Carl is thinking...';
       }
-      return this.turn() === this.aiService.aiColor() ? 'AI is moving...' : 'Your turn';
+      return this.turn() === this.aiService.aiColor() ? 'Carl is moving...' : 'Your turn';
     }
     return this.turn() === 'w' ? "White's turn" : "Black's turn";
   });
@@ -263,8 +263,8 @@ export class ChessEngineService {
             this.audioService.playSound('move');
           }
         }
-      } catch (e) {
-        console.error('Error applying AI move:', e);
+      } catch {
+        // Handled silently
       }
     }
   }
